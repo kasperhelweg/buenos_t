@@ -136,14 +136,24 @@ void syscall_handle( context_t *user_context )
     break;
     /* Stubs for exetended syscalls */
   case SYSCALL_OPEN:
+    user_context->cpu_regs[MIPS_REGISTER_V0] =
+      vfs_open( (char*)A1 );
     break;
   case SYSCALL_CLOSE:
+    user_context->cpu_regs[MIPS_REGISTER_V0] =
+      vfs_close( (openfile_t)A1 );
     break;
   case SYSCALL_SEEK:
+    user_context->cpu_regs[MIPS_REGISTER_V0] =
+      vfs_seek( (openfile_t)A1, A2 );
     break;
   case SYSCALL_CREATE:
+    user_context->cpu_regs[MIPS_REGISTER_V0] =
+      vfs_create( (char*)A1, A2 );
     break;
   case SYSCALL_DELETE:
+    user_context->cpu_regs[MIPS_REGISTER_V0] =
+      vfs_remove( (char*)A1, A2 );
     break;
   default:
     KERNEL_PANIC( "Unhandled system call\n" );
