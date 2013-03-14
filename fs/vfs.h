@@ -145,7 +145,7 @@ int vfs_mount_fs(gbd_t *disk, char *volumename);
 int vfs_mount(fs_t *fs, char *name);
 int vfs_unmount(char *name);
 
-openfile_t vfs_open(char *pathname);
+openfile_t vfs_open(char* pathname);
 int vfs_close(openfile_t file);
 int vfs_seek(openfile_t file, int seek_position);
 int vfs_read(openfile_t file, void *buffer, int bufsize);

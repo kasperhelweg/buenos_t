@@ -90,6 +90,18 @@ process_id_t syscall_exec( const char *filename )
   return process_spawn( filename );
 }
 
+
+openfile_t syscall_open( char* pathname )
+{
+  return vfs_open( pathname );
+}
+
+
+int syscall_close( openfile_t file )
+{
+  return vfs_close( file );
+}
+
 /**
  * Handle system calls. Interrupts are enabled when this function is
  * called.
@@ -137,11 +149,11 @@ void syscall_handle( context_t *user_context )
     /* Stubs for exetended syscalls */
   case SYSCALL_OPEN:
     user_context->cpu_regs[MIPS_REGISTER_V0] =
-      vfs_open( (char*)A1 );
+      syscall_open( (char*)A1 );
     break;
   case SYSCALL_CLOSE:
     user_context->cpu_regs[MIPS_REGISTER_V0] =
-      vfs_close( (openfile_t)A1 );
+      syscall_close( (openfile_t)A1 );
     break;
   case SYSCALL_SEEK:
     user_context->cpu_regs[MIPS_REGISTER_V0] =
