@@ -264,6 +264,11 @@ process_id_t process_spawn(const char *executable)
     stringcopy(process_table[pid].executable, executable, PROCESS_MAX_FILELENGTH);
     process_table[pid].parent = process_get_current_process();
 
+    /* add initial filehandles for stdin, stdout and stderr */
+    process_table[pid].files[0] = 0;
+    process_table[pid].files[1] = 1;
+    process_table[pid].files[2] = 2;
+    
     thread = thread_create((void (*)(uint32_t))(&process_start), pid);
     thread_run(thread);
     return pid;
