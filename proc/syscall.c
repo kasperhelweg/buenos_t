@@ -59,6 +59,7 @@ int syscall_write( uint32_t fd, char *s, int len )
       gcd = (gcd_t *)dev->generic_device;
       return gcd->write( gcd, s, len );
     } else {
+    /* should check if file is open for write */
     return vfs_write(fd, s, len);
   }
 }
@@ -74,6 +75,7 @@ int syscall_read( uint32_t fd, char *s, int len )
       return gcd->read( gcd, s, len );
     }
   else {
+    /* should check if file is open for read */
     return vfs_read(fd, s, len);
   }
 }
