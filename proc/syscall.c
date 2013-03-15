@@ -93,13 +93,19 @@ process_id_t syscall_exec( const char *filename )
 
 openfile_t syscall_open( char* pathname )
 {
-  return vfs_open( pathname );
+  openfile_t fd;
+
+  fd = process_open_file( pathname );
+  return fd;
 }
 
 
 int syscall_close( openfile_t file )
 {
-  return vfs_close( file );
+  int rv;
+  
+  rv = process_close_file( file );
+  return rv;
 }
 
 /**

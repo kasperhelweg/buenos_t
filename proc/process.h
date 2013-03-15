@@ -39,6 +39,9 @@
 
 #include "lib/types.h"
 
+#define PROCESS_FILES_TABLE_FULL -10
+#define PROCESS_FILES_FILE_NOT_OPEN -11
+
 #define USERLAND_STACK_TOP 0x7fffeffc
 
 #define PROCESS_PTABLE_FULL  -1
@@ -85,15 +88,21 @@ void process_finish(int retval);
  * Only works on child processes */
 int process_join(process_id_t pid);
 
+int process_open_file( char* pathname );
+int process_close_file( int fd );
+
+/* return list of open files for current process */
+int* process_list_files( void );
+
 /* Add a file to the current process's file list. Returns negative value on
  * error. */
-int process_add_file(int fd);
+int process_add_file( int fd );
 
 /* Remove a file from the current process's file list. Returns negative value
  * on error. */
-int process_rem_file(int fd);
+int process_rem_file( int fd );
 
 /* Check if a file is in the current process's file list. Returns 0 if it is. */
-int process_check_file(int fd);
+int process_check_file( int fd );
 
 #endif

@@ -42,7 +42,6 @@
 /* Return codes for filesytem functions. Positive return values equal
    to VFS_OK */
 #define VFS_OK 0
-#define VFS_NOT_SUPPORTED -1
 #define VFS_ERROR -2
 #define VFS_INVALID_PARAMS -3
 #define VFS_NOT_OPEN -4
