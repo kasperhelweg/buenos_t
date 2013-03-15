@@ -173,6 +173,11 @@ void syscall_handle( context_t *user_context )
     user_context->cpu_regs[MIPS_REGISTER_V0] =
       vfs_remove( (char*)A1 );
     break;
+  case SYSCALL_LIST:
+    user_context->cpu_regs[MIPS_REGISTER_V0] =
+      (int)process_list_files( );
+    break;
+ 
   default:
     KERNEL_PANIC( "Unhandled system call\n" );
   }

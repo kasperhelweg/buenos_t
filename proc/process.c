@@ -349,7 +349,8 @@ int process_open_file( char* pathname )
   interrupt_status_t intr_status;
   openfile_t fd;
     
-  int i, rv, empty_files_slot;
+  int i, empty_files_slot;
+  int rv = PROCESS_FILES_TABLE_FULL;
   intr_status = _interrupt_disable( );
   spinlock_acquire( &process_table_slock );
   
@@ -375,10 +376,6 @@ int process_open_file( char* pathname )
   spinlock_release( &process_table_slock );
   _interrupt_set_state( intr_status );
   
-  /* was the files table full? */
-  if( empty_files_slot == -1 ) 
-    rv = PROCESS_FILES_TABLE_FULL;
-
   return rv;
 }
 
@@ -387,7 +384,8 @@ int process_close_file( int fd )
   process_id_t cur = process_get_current_process();
   interrupt_status_t intr_status;
 
-  int i, rv, files_slot;
+  int i, files_slot;
+  int rv = PROCESS_FILES_FILE_NOT_OPEN;
   intr_status = _interrupt_disable( );
   spinlock_acquire( &process_table_slock );
 
@@ -404,9 +402,6 @@ int process_close_file( int fd )
 
   spinlock_release( &process_table_slock );
   _interrupt_set_state( intr_status );
-
-  if( files_slot != fd ) 
-    rv = PROCESS_FILES_FILE_NOT_OPEN;
     
   return rv;
 }
