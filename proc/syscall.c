@@ -59,8 +59,7 @@ int syscall_write( uint32_t fd, char *s, int len )
       gcd = (gcd_t *)dev->generic_device;
       return gcd->write( gcd, s, len );
     } else {
-    KERNEL_PANIC( "Write syscall not finished yet." );
-    return 0;
+    return vfs_write(fd, s, len);
   }
 }
 
@@ -75,8 +74,7 @@ int syscall_read( uint32_t fd, char *s, int len )
       return gcd->read( gcd, s, len );
     }
   else {
-    KERNEL_PANIC( "Read syscall not finished yet." );
-    return 0;
+    return vfs_read(fd, s, len);
   }
 }
 

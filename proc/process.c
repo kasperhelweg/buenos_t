@@ -371,6 +371,7 @@ int process_open_file( char* pathname )
       break;
     }
   }
+
   spinlock_release( &process_table_slock );
   _interrupt_set_state( intr_status );
   
