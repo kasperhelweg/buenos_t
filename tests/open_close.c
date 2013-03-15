@@ -18,28 +18,20 @@ int main(void)
   char *read;
   int count;
 
-  heap_init();
+  heap_init( );
  
   puts("---Filesystem operations---\n");
-  /***** TEST OPEN AND CLOSE - SUCCESS *****/
+  /***** TEST OPEN / CLOSE / READ - SUCCESS *****/
   /* try to open empty file */
   open_file_rv = syscall_open( file );
   printf("open_file says: %d\n", open_file_rv);
-
+  
   puts("---Reading from file---\n");
   read = (char*)malloc(BUFFER_SIZE);
   count = syscall_read( open_file_rv, read, BUFFER_SIZE );
   printf("Chars read: %d\n", count);
   printf("Text read: %s", read);
- 
-  /*
-  open_files = (int*)syscall_list();
-  int i;
-  for( i = 0; i < 10; i++ ) {
-    printf("file_id: %d", open_files[i]);
-  }
-  */
-
+   
   /* try to close empty file */
   close_file_rv = syscall_close( open_file_rv );
   printf("close says: %d\n", close_file_rv);
@@ -51,20 +43,10 @@ int main(void)
   open_file_rv = syscall_open( file_fail );
   printf("open_file says: %d\n", open_file_rv);
 
-  /*
-  open_files = (int*)syscall_list();
-  int i;
-  for( i = 0; i < 10; i++ ) {
-    printf("file_id: %d", open_files[i]);
-  }
-  */
-
   /* try to close empty file */
   close_file_rv = syscall_close( 3 );
   printf("close says: %d\n", close_file_rv);
 
-  
-  
   syscall_exit(2);
   return 0;
 }
