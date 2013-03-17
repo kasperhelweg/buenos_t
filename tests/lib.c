@@ -183,9 +183,9 @@ int syscall_delete(const char *filename)
   return (int)_syscall(SYSCALL_DELETE, (uint32_t)filename, 0, 0);
 }
 
-int syscall_list( void )
+int syscall_list( int* files )
 {
-  return (int)_syscall(SYSCALL_LIST, 0, 0, 0);
+  return (int)_syscall(SYSCALL_LIST, (uint32_t)files, 0, 0);
 }
 
 

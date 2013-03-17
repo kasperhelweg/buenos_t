@@ -43,6 +43,7 @@
 #include "drivers/device.h"
 #include "drivers/gcd.h"
 #include "fs/vfs.h"
+#include "lib/debug.h"
 
 void syscall_exit( int retval )
 {
@@ -60,7 +61,11 @@ int syscall_write( uint32_t fd, char *s, int len )
       return gcd->write( gcd, s, len );
     } else {
     /* should check if file is open for write */
-    return vfs_write(fd, s, len);
+    DEBUG( "debug_write", "FD: %d\n", fd );
+    if( process_check_file( fd ) == 0 )      
+      return vfs_write(fd - 2, s, len);
+    else  
+      return PROCESS_FILES_FILE_NOT_OPEN; 
   }
 }
 
@@ -76,8 +81,19 @@ int syscall_read( uint32_t fd, char *s, int len )
     }
   else {
     /* should check if file is open for read */
-    return vfs_read(fd, s, len);
+    if( process_check_file( fd ) == 0 )
+      return vfs_read(fd - 2, s, len);
+    else  
+      return PROCESS_FILES_FILE_NOT_OPEN; 
   }
+}
+
+int syscall_seek( uint32_t fd, int position )
+{
+  if( process_check_file( fd ) == 0 )
+    return vfs_seek(fd - 2, position);
+  else  
+    return PROCESS_FILES_FILE_NOT_OPEN; 
 }
 
 int syscall_join( process_id_t pid )
@@ -93,19 +109,12 @@ process_id_t syscall_exec( const char *filename )
 
 openfile_t syscall_open( char* pathname )
 {
-  openfile_t fd;
-
-  fd = process_open_file( pathname );
-  return fd;
+  return process_open_file( pathname );
 }
-
 
 int syscall_close( openfile_t file )
 {
-  int rv;
-  
-  rv = process_close_file( file );
-  return rv;
+  return process_close_file( file );
 }
 
 /**
@@ -163,7 +172,7 @@ void syscall_handle( context_t *user_context )
     break;
   case SYSCALL_SEEK:
     user_context->cpu_regs[MIPS_REGISTER_V0] =
-      vfs_seek( (openfile_t)A1, A2 );
+      syscall_seek( (openfile_t)A1 , A2 );
     break;
   case SYSCALL_CREATE:
     user_context->cpu_regs[MIPS_REGISTER_V0] =
@@ -175,9 +184,8 @@ void syscall_handle( context_t *user_context )
     break;
   case SYSCALL_LIST:
     user_context->cpu_regs[MIPS_REGISTER_V0] =
-      (int)process_list_files( );
+      (int)process_list_files( (int*)A1 );
     break;
- 
   default:
     KERNEL_PANIC( "Unhandled system call\n" );
   }

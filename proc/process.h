@@ -92,7 +92,7 @@ int process_open_file( char* pathname );
 int process_close_file( int fd );
 
 /* return list of open files for current process */
-int* process_list_files( void );
+int* process_list_files( int* files );
 
 /* Add a file to the current process's file list. Returns negative value on
  * error. */

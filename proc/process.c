@@ -270,6 +270,7 @@ process_id_t process_spawn(const char *executable)
   process_table[pid].files[0] = 0;
   process_table[pid].files[1] = 1;
   process_table[pid].files[2] = 2;
+
   /* default fail filehandles */
   for( i=3; i < PROCESS_MAX_FILES; i++ ){
     process_table[pid].files[i] = -1;
@@ -351,6 +352,7 @@ int process_open_file( char* pathname )
     
   int i, empty_files_slot;
   int rv = PROCESS_FILES_TABLE_FULL;
+  
   intr_status = _interrupt_disable( );
   spinlock_acquire( &process_table_slock );
   
@@ -366,6 +368,7 @@ int process_open_file( char* pathname )
       if( fd < 0 ) {
         rv = fd;
       } else {
+        fd = fd + 2;
         process_table[cur].files[i] = fd;      
         rv = fd;
       }
@@ -392,7 +395,7 @@ int process_close_file( int fd )
   for( i = 3; i < PROCESS_MAX_FILES; i++ ) {
     files_slot = process_table[cur].files[i];
     if( files_slot == fd ) {
-      rv = vfs_close( fd );
+      rv = vfs_close( fd - 2 );
       if( rv >= 0 ) {
         process_table[cur].files[i] = -1;      
       }
@@ -406,10 +409,23 @@ int process_close_file( int fd )
   return rv;
 }
 
-int* process_list_files( void )
+int* process_list_files( int* files )
 {
-  process_id_t cur = process_get_current_process();
-  return process_table[cur].files;
+  process_id_t cur = process_get_current_process();  
+  interrupt_status_t intr_status;
+      
+  intr_status = _interrupt_disable( );
+  spinlock_acquire( &process_table_slock );
+ 
+  int i;
+  for ( i = 0; i < PROCESS_MAX_FILES; i++ ) {
+    files[i] = process_table[cur].files[i];
+  }
+  
+  spinlock_release( &process_table_slock );
+  _interrupt_set_state( intr_status );
+  
+  return files;
 }
 
 
@@ -427,9 +443,14 @@ int process_rem_file( int fd )
 int process_check_file( int fd )
 {
   process_id_t cur = process_get_current_process();
-  if( process_table[cur].files[fd] < 0 ) return -1; 
   
-  return 0; 
+  int i;
+  for ( i = 0; i < PROCESS_MAX_FILES; i++ ) {
+    if ( process_table[cur].files[i] == fd )
+      return 0;
+  }
+
+  return -1; 
 }
 
 /** @} */
