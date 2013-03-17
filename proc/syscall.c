@@ -159,7 +159,6 @@ void syscall_handle( context_t *user_context )
     user_context->cpu_regs[MIPS_REGISTER_V0] =
       syscall_exec( (char *)A1 );
     break;
-    /* Stubs for exetended syscalls */
   case SYSCALL_OPEN:
     user_context->cpu_regs[MIPS_REGISTER_V0] =
       syscall_open( (char*)A1 );
