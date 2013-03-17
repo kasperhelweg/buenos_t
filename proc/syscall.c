@@ -61,7 +61,6 @@ int syscall_write( uint32_t fd, char *s, int len )
       return gcd->write( gcd, s, len );
     } else {
     /* should check if file is open for write */
-    DEBUG( "debug_write", "FD: %d\n", fd );
     if( process_check_file( fd ) == 0 )      
       return vfs_write(fd - 2, s, len);
     else  
@@ -105,7 +104,6 @@ process_id_t syscall_exec( const char *filename )
 {
   return process_spawn( filename );
 }
-
 
 openfile_t syscall_open( char* pathname )
 {

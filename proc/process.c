@@ -389,6 +389,7 @@ int process_close_file( int fd )
 
   int i, files_slot;
   int rv = PROCESS_FILES_FILE_NOT_OPEN;
+
   intr_status = _interrupt_disable( );
   spinlock_acquire( &process_table_slock );
 
@@ -428,29 +429,40 @@ int* process_list_files( int* files )
   return files;
 }
 
+int process_check_file( int fd )
+{
+  process_id_t cur = process_get_current_process();
+  interrupt_status_t intr_status; 
+  
+  int i;
+  int rv = -1;
+  
+  intr_status = _interrupt_disable( );
+  spinlock_acquire( &process_table_slock );
+  
+  for ( i = 0; i < PROCESS_MAX_FILES; i++ ) {
+    if ( process_table[cur].files[i] == fd ) {
+      rv = 0;
+      break;
+    }
+  }
+  
+  spinlock_release( &process_table_slock );
+  _interrupt_set_state( intr_status );
+  
+  return rv; 
+}
 
 int process_add_file( int fd )
 {
   fd = fd;
   return 0;
 }
+
 int process_rem_file( int fd )
 {
   fd = fd;
   return 0;
-}
-
-int process_check_file( int fd )
-{
-  process_id_t cur = process_get_current_process();
-  
-  int i;
-  for ( i = 0; i < PROCESS_MAX_FILES; i++ ) {
-    if ( process_table[cur].files[i] == fd )
-      return 0;
-  }
-
-  return -1; 
 }
 
 /** @} */
