@@ -1,5 +1,5 @@
 /*
- * Trivial Filesystem (TFS).
+ * Grow Filesystem (TFS).
  *
  * Copyright (C) 2003 Juha Aatrokoski, Timo Lilja,
  *   Leena Salmela, Teemu Takanen, Aleksi Virtanen.
@@ -30,7 +30,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: tfs.c,v 1.21 2005/04/22 07:00:47 lsalmela Exp $
+ * $Id: gfs.c,v 1.21 2005/04/22 07:00:47 lsalmela Exp $
  *
  */
 
@@ -43,15 +43,15 @@
 #include "lib/libc.h"
 #include "lib/bitmap.h"
 
-/**@name Trivial Filesystem (TFS)
+/**@name Grow Filesystem (GFS)
  *
- * This module contains implementation for TFS.
+ * This module contains implementation for GFS.
  *
  * @{
  */
 
 
-/* Data structure used internally by TFS filesystem. This data structure 
+/* Data structure used internally by GFS filesystem. This data structure 
    is used by tfs-functions. it is initialized during tfs_init(). Also
    memory for the buffers is reserved _dynamically_ during init.
 
@@ -62,7 +62,7 @@ typedef struct {
     /* Total number of blocks of the disk */ 
     uint32_t       totalblocks;
 
-    /* Pointer to gbd device performing tfs */
+    /* Pointer to gbd device performing gfs */
     gbd_t          *disk;
 
     /* lock for mutual exclusion of fs-operations (we support only
@@ -79,10 +79,10 @@ typedef struct {
 /** 
  * Initialize trivial filesystem. Allocates 1 page of memory dynamically for
  * filesystem data structure, tfs data structure and buffers needed.
- * Sets fs_t and tfs_t fields. If initialization is succesful, returns
+ * Sets fs_t and gfs_t fields. If initialization is succesful, returns
  * pointer to fs_t data structure. Else NULL pointer is returned.
  *
- * @param Pointer to gbd-device performing tfs.
+ * @param Pointer to gbd-device performing gfs.
  *
  * @return Pointer to the filesystem data structure fs_t, if fails
  * return NULL. 
@@ -103,14 +103,14 @@ fs_t * gfs_init(gbd_t *disk)
     /* check semaphore availability before memory allocation */
     sem = semaphore_create(1);
     if (sem == NULL) {
-	kprintf("tfs_init: could not create a new semaphore.\n");
+	kprintf("gfs_init: could not create a new semaphore.\n");
 	return NULL;
     }
 
     addr = pagepool_get_phys_page();
     if(addr == 0) {
         semaphore_destroy(sem);
-	kprintf("tfs_init: could not allocate memory.\n");
+	kprintf("gfs_init: could not allocate memory.\n");
 	return NULL;
     }
     addr = ADDR_PHYS_TO_KERNEL(addr);      /* transform to vm address */
@@ -119,7 +119,7 @@ fs_t * gfs_init(gbd_t *disk)
     /* Assert that one page is enough */
     KERNEL_ASSERT(PAGE_SIZE >= (3*GFS_BLOCK_SIZE+sizeof(gfs_t)+sizeof(fs_t)));
     
-    /* Read header block, and make sure this is tfs drive */
+    /* Read header block, and make sure this is gfs drive */
     req.block = 0;
     req.sem = NULL;
     req.buf = ADDR_KERNEL_TO_PHYS(addr);   /* disk needs physical addr */
@@ -127,7 +127,7 @@ fs_t * gfs_init(gbd_t *disk)
     if(r == 0) {
         semaphore_destroy(sem);
 	pagepool_free_phys_page(ADDR_KERNEL_TO_PHYS(addr));
-	kprintf("tfs_init: Error during disk read. Initialization failed.\n");
+	kprintf("gfs_init: Error during disk read. Initialization failed.\n");
 	return NULL; 
     }
 
@@ -140,7 +140,7 @@ fs_t * gfs_init(gbd_t *disk)
     /* Copy volume name from header block. */
     stringcopy(name, (char *)(addr+4), GFS_VOLUMENAME_MAX);
 
-    /* fs_t, tfs_t and all buffers in tfs_t fit in one page, so obtain
+    /* fs_t, gfs_t and all buffers in gfs_t fit in one page, so obtain
        addresses for each structure and buffer inside the allocated
        memory page. */
     fs  = (fs_t *)addr;
@@ -174,7 +174,7 @@ fs_t * gfs_init(gbd_t *disk)
 
 
 /**
- * Unmounts tfs filesystem from gbd device. After this TFS-driver and
+ * Unmounts tfs filesystem from gbd device. After this GFS-driver and
  * gbd-device are no longer linked together. Implements
  * fs.unmount(). Waits for the current operation(s) to finish, frees
  * reserved memory and returns OK.
@@ -200,7 +200,7 @@ int gfs_unmount(fs_t *fs)
 
 
 /**
- * Opens file. Implements fs.open(). Reads directory block of tfs
+ * Opens file. Implements fs.open(). Reads directory block of gfs
  * device and finds given file. Returns file's inode block number or
  * VFS_NOT_FOUND, if file not found.
  * 

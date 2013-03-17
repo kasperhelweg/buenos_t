@@ -30,7 +30,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: tfs.h,v 1.10 2004/02/18 17:24:49 tlilja Exp $
+ * $Id: gfs.h,v 1.10 2004/02/18 17:24:49 tlilja Exp $
  *
  */
 
@@ -42,11 +42,11 @@
 #include "lib/libc.h"
 #include "lib/bitmap.h"
 
-/* In TFS block size is 512. This will affect to various other
-   features of TFS e.g. maximum file size. */
+/* In GFS block size is 512. This will affect to various other
+   features of GFS e.g. maximum file size. */
 #define GFS_BLOCK_SIZE 512
 
-/* Magic number found on each tfs filesystem's header block. */
+/* Magic number found on each gfs filesystem's header block. */
 #define GFS_MAGIC 0xD00F
 
 /* Block numbers for system blocks */
